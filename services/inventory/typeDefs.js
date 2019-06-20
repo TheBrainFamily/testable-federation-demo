@@ -6,6 +6,6 @@ exports.typeDefs = gql`
     weight: Int @external
     price: Int @external
     inStock: Boolean
-    shippingEstimate: Int @requires(fields: "price weight")
+    shippingEstimate: Float @requires(fields: "price weight")
   }
 `;
