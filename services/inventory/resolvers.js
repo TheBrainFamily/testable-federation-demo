@@ -1,3 +1,5 @@
+const { estimateShipping } = require("./estimateShipping");
+
 exports.resolvers = {
   Product: {
     __resolveReference(object) {
@@ -6,12 +8,11 @@ exports.resolvers = {
         ...inventory.find(product => product.upc === object.upc)
       };
     },
-    shippingEstimate(object) {
-      // free for expensive items
-      if (object.price > 1000) return 0;
-      // estimate is based on weight
-      return object.weight * 0.5;
-    }
+    shippingEstimate: object =>
+      estimateShipping({
+        price: object.price,
+        weight: object.weight
+      })
   }
 };
 

@@ -1,5 +1,10 @@
+const td = require("testdouble");
+require("testdouble-jest")(td, jest);
 const { gql } = require("apollo-server");
 const { executeGraphql } = require("federation-testing-tool");
+
+const { estimateShipping } = td.replace("./estimateShipping");
+
 const { typeDefs } = require("./typeDefs");
 const { resolvers } = require("./resolvers");
 
@@ -13,18 +18,19 @@ describe("Based on the data passed down from the gateway, the shippingEstimate",
       }
     }
   `;
-  it("should be 0 for an item with a price over 1000", async () => {
-    const mocks = { Product: () => ({ price: 1001 }) };
+  it("should be calculated with estimateShipping based on the price and weight", async () => {
+    const PRICE = 999;
+    const WEIGHT = 100;
+    const mocks = { Product: () => ({ price: PRICE, weight: WEIGHT }) };
 
-    const result = await executeGraphql({ query, service, mocks });
+    td.when(estimateShipping({ price: PRICE, weight: WEIGHT })).thenReturn(99);
 
-    expect(result.data._getProduct.shippingEstimate).toStrictEqual(0);
-  });
-  it("should be calculated as 1 dollar per 2 pounds if price 1000 or below", async () => {
-    const mocks = { Product: () => ({ price: 999, weight: 100 }) };
+    const result = await executeGraphql({
+      query,
+      service,
+      mocks
+    });
 
-    const result = await executeGraphql({ query, service, mocks });
-
-    expect(result.data._getProduct.shippingEstimate).toEqual(50);
+    expect(result.data._getProduct.shippingEstimate).toEqual(99);
   });
 });
