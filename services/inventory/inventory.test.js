@@ -18,7 +18,7 @@ describe("Based on the data passed down from the gateway, the shippingEstimate",
 
     const result = await executeGraphql({ query, service, mocks });
 
-    expect(result.data._getProduct.shippingEstimate).toEqual(0);
+    expect(result.data._getProduct.shippingEstimate).toStrictEqual(0);
   });
   it("should be calculated as 1 dollar per 2 pounds if price 1000 or below", async () => {
     const mocks = { Product: () => ({ price: 999, weight: 100 }) };
